@@ -22,14 +22,14 @@ workflow:
         stackSpec:
 
           repo:
-            url: "https://github.com/ankit38g/engineering_metrics_pov"
+            url: "https://github.com/ankit38g/engg_metrics_pov"
             # auth:
             #   username: "${GITSYNC_USERNAME}"
             #   password: "${GITSYNC_PASSWORD}"
             syncFlags:
               - "--ref=main"
 
-            baseDir: "engineering_metrics_pov/build/data-processing"
+            baseDir: "engg_metrics_pov/build/data-processing"
 
           source:
             address: >
