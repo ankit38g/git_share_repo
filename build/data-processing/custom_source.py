@@ -1,40 +1,45 @@
+import os
 import requests
 import nilus
-from nilus import CustomSource
 
-@nilus.source()
-class GitHubApiSource(CustomSource):
+@nilus.source
+def github_source(repo: str, endpoint: str):
+    """
+    Nilus Custom Source to fetch GitHub API data using:
+    - Repo: owner/repo
+    - Endpoint: commits, issues, pulls, etc.
 
-    def __init__(self, repo, endpoint, **kwargs):
-        super().__init__(**kwargs)
-        self.repo = repo
-        self.endpoint = endpoint
+    Example:
+        custom://github_source?repo=ankit38g/product-affinity-training&endpoint=commits
+    """
 
-    def run(self):
-        import os
+    username = os.getenv("GITSYNC_USERNAME")
+    token = os.getenv("GITSYNC_PASSWORD")
 
-        username = os.getenv("GITSYNC_USERNAME")
-        token = os.getenv("GITSYNC_PASSWORD")
+    if not token:
+        raise Exception("GitHub token missing. Expected in env: GITSYNC_PASSWORD")
 
-        if not token:
-            raise Exception("GitHub token not found in environment (GITSYNC_PASSWORD).")
+    api_url = f"https://api.github.com/repos/{repo}/{endpoint}"
 
-        api_url = f"https://api.github.com/repos/{self.repo}/{self.endpoint}"
+    headers = {
+        "Authorization": f"token {token}",
+        "User-Agent": username or "nilus-github-source"
+    }
 
-        headers = {
-            "Authorization": f"token {token}",
-            "User-Agent": username or "nilus-github-client"
-        }
+    response = requests.get(api_url, headers=headers)
 
-        response = requests.get(api_url, headers=headers)
+    if response.status_code != 200:
+        raise Exception(
+            f"GitHub API error: {response.status_code} → {response.text}"
+        )
 
-        if response.status_code != 200:
-            raise Exception(
-                f"GitHub API error: {response.status_code}, {response.text}"
-            )
+    data = response.json()
 
-        data = response.json()
+    # Ensure proper iteration: response should be a list
+    if isinstance(data, dict):
+        # Sometimes GitHub returns a dict (e.g., rate limit)
+        yield data
+        return
 
-        # Yield each record for Nilus
-        for item in data:
-            yield item
+    for item in data:
+        yield item
