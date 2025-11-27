@@ -32,10 +32,7 @@ workflow:
             baseDir: "engg_metrics_pov/build/data-processing"
 
           source:
-            address: >
-              custom://GitHubApiSource?
-              repo=ankit38g/product-affinity-training
-              &endpoint=commits
+            address: "custom://GitHubApiSource?repo=ankit38g/product-affinity-training&endpoint=commits"
             options:
               source-table: github_commits
 
