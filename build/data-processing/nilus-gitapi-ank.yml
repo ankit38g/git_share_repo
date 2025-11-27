@@ -32,7 +32,7 @@ workflow:
             baseDir: "engg_metrics_pov/build/data-processing"
 
           source:
-            address: "custom://GitHubApiSource_wrapper?repo=ankit38g/engg_metrics_pov&endpoint=commits"
+            address: "custom://GitHubApiSource?repo=ankit38g/engg_metrics_pov&endpoint=commits"
             options:
               source-table: github_commits
 

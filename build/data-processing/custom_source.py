@@ -6,19 +6,36 @@ from nilus import CustomSource
 
 
 # ---------------------------------------------------------
-# 1) Nilus expects at least one CustomSource subclass
+# 1) Nilus class — MUST exist and MUST be named in YAML
 # ---------------------------------------------------------
 class GitHubApiSource(CustomSource):
+
     def handles_incrementality(self) -> bool:
         return False
 
-    # Not used, but must exist
     def nilus_source(self, uri: str, table: str, **kwargs):
-        pass
+        """
+        Nilus will call this method with the full URI.
+        We parse parameters and call the actual wrapper.
+        """
+        from urllib.parse import urlparse, parse_qs
+
+        parsed = urlparse(uri)
+        params = parse_qs(parsed.query)
+
+        repo = params.get("repo", [None])[0]
+        endpoint = params.get("endpoint", [None])[0]
+
+        if not repo:
+            raise Exception("Missing repo=? in URI")
+        if not endpoint:
+            raise Exception("Missing endpoint=? in URI")
+
+        return GitHubApiSource_wrapper(repo=repo, endpoint=endpoint)
 
 
 # ---------------------------------------------------------
-# 2) Actual GitHub Source Logic (function-based)
+# 2) The real GitHub API logic
 # ---------------------------------------------------------
 class GitHubApiRunner:
 
@@ -26,38 +43,37 @@ class GitHubApiRunner:
         print(f"[GitHubApiRunner] repo={repo}")
         print(f"[GitHubApiRunner] endpoint={endpoint}")
 
-        username = os.getenv("GITSYNC_USERNAME")
         token = os.getenv("GITSYNC_PASSWORD")
+        username = os.getenv("GITSYNC_USERNAME")
 
         if not token:
-            raise Exception("GitHub token missing. Expected: GITSYNC_PASSWORD")
+            raise Exception("GitHub token missing in GITSYNC_PASSWORD")
 
         url = f"https://api.github.com/repos/{repo}/{endpoint}"
 
         headers = {
             "Authorization": f"token {token}",
-            "User-Agent": username or "nilus-github-source"
+            "User-Agent": username or "nilus-github"
         }
 
         response = requests.get(url, headers=headers)
         if response.status_code != 200:
-            raise Exception(f"GitHub API error: {response.status_code} → {response.text}")
+            raise Exception(f"GitHub API error {response.status_code}: {response.text}")
 
         data = response.json()
-
         if isinstance(data, dict):
             data = [data]
 
         @dlt.resource(name="github_commits")
         def github_commits():
-            for item in data:
-                yield item
+            for row in data:
+                yield row
 
         return github_commits
 
 
 # ---------------------------------------------------------
-# 3) Nilus wrapper — the entrypoint specified in yaml
+# 3) Decorated wrapper — Nilus-friendly
 # ---------------------------------------------------------
 @nilus.source
 def GitHubApiSource_wrapper(repo: str, endpoint: str):
