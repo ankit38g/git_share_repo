@@ -1,0 +1,13 @@
+# Oracle Read Instance-secret Manifest
+
+name: mndepot-r # Unique identifier for Resource, replace ${oracle-depot-name} with depot name
+version: v1 # Manifest version
+type: instance-secret # Type of the Resource
+description: Instance secret for oracle DB # Purpose of the Instance-secret
+layer: user # DataOS layer
+instance-secret:
+  type: key-value-properties # Secret type
+  acl: r # Access control: 'r' for read-only
+  data:
+    username: system # replace with oracle username
+    password: Manju123 # replace with oracle password

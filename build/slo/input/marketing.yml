@@ -1,0 +1,59 @@
+name: soda-marketing-quality-ank
+version: v1
+type: workflow
+tags:
+  - workflow
+  - soda-checks
+description: Applying quality checks for the marketing data
+workspace: public
+workflow:
+  # schedule:
+  #   cron: '10 08 * * *'
+  #  # endOn: '2023-12-12T22:00:00Z'
+  #   concurrencyPolicy: Forbid
+  dag:
+    - name: soda-marketing-quality-job
+      spec:
+        stack: soda+python:1.0
+        compute: runnable-default
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 250Mi
+          limits:
+            cpu: 1000m
+            memory: 250Mi
+        logLevel: INFO # WARNING, ERROR, DEBUG
+        stackSpec:
+          inputs:
+            - dataset: dataos://icebase:ankit/marketing_data_ank
+              options:
+                engine: minerva
+                clusterName: miniature
+              profile:
+                columns:
+                  - include *
+              checks:  
+                - schema:
+                    name: Response should be in integer format
+                    fail:
+                      when wrong column type:
+                        response: bigint
+                    attributes:
+                      category: Schema
+
+                - invalid_count(customer_id) = 1 :
+                    name: Customer Id  should not be zero
+                    valid min: 1
+                    attributes:
+                      category: Validity
+ 
+                - missing_count(customer_id) = 0:
+                    name:  Customer Id should not be zero
+                    attributes:
+                      category: Completeness
+
+                - duplicate_count(customer_id) = 0:
+                    name:  Customer Id should not be duplicated
+                    attributes:
+                      category: Uniqueness

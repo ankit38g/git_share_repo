@@ -1,0 +1,20 @@
+version: v1
+name: customersegmentspolicy
+type: policy
+layer: user
+description: "data policy to filter Customer Segments"
+owner:
+policy:
+  data:
+    type: filter
+    priority: 40
+    dataset_id: lakehouse.customer_relationship_management.cross_sell_recommendations
+    selector:
+      user:
+        match: any
+        tags:
+          - "roles:id:restricted-access"
+    filters:
+      - column: customer_segments
+        operator: not_equals
+        value: "High Risk"

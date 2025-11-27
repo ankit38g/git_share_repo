@@ -1,0 +1,60 @@
+name: failedworkflowpager-ank
+version: v1alpha
+type: pager
+description: sends alerts to email and teams when a juicefs pod deletion incident is created
+pager:
+  conditions:
+    - valueJqFilter: .properties.name
+      operator: equals
+      value: Failed Workflow Alert
+    - valueJqFilter: .properties.incident_type
+      operator: equals
+      value: Alerts For Failed Workflow
+  output:
+    email:
+      emailTargets:
+        - ankit.garg@tmdc.io
+      templateType: liquid
+      template: |
+        <p><strong>Dear Team,</strong></p>
+
+        <p>⚠️ Our system detected an issue with the workflow and was unable to complete the process as expected.</p>
+
+        <div style="font-family: Arial, sans-serif;">
+          <table border="0" cellspacing="0" cellpadding="8" style="font-family: Arial, sans-serif; font-size: 14px; width: 100%; border-collapse: collapse;">
+            <tbody>
+              <tr style="border-top: 2px solid #000; border-bottom: 1px solid #ccc;">
+                <td style="font-weight: bold;">Incident Name</td>
+                <td>{{ incidentProperties.name }}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #ccc;">
+                <td style="font-weight: bold;">Severity</td>
+                <td>{{ incidentProperties.severity }}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #ccc;">
+                <td style="font-weight: bold;">Workflow Name</td>
+                <td>{{ (incidentContext.resourceId | split: ':')[2] }}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #ccc;">
+                <td style="font-weight: bold;">Failure Time</td>
+                <td>{{ incidentCreated }}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #ccc;">
+                <td style="font-weight: bold;">Run Details</td>
+                <td><a href="https://gentle-ghoul.dataos.app/operations/user-space/resources/resource-runtime?name={{ (incidentContext.resourceId | split: ':')[2] }}&type=workflow&workspace=public">Operation</a></td>
+              </tr>
+              <tr style="border-bottom: 2px solid #000;">
+                <td style="font-weight: bold;">Logs</td>
+                <td><a href="https://gentle-ghoul.dataos.app/metis/resources/workflow/dataos.public.{{ (incidentContext.resourceId | split: ':')[2] }}/run_history">Metis</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>We understand the importance of timely and accurate data processing, and our team is actively working to resolve the issue and get the pipeline back up and running as soon as possible. In the meantime, please be aware that the data processing for the affected workflow may be delayed or incomplete.</p>
+
+        <p>If you have any questions or concerns, please do not hesitate to reach out to us on our support portal. We will keep you updated on the status of the resolution efforts.</p>
+
+        <p>Best regards,</p>
+
+        <p>The Modern Data Company</p>

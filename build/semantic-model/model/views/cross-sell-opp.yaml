@@ -1,0 +1,51 @@
+views:
+  - name: cross_sell_opportunity_score
+    description: This metric calculate the potential for cross-selling a secondary product to customers based on past purchases. 
+    public: true
+    meta:
+      title: Cross-Sell Opportunity Score
+      tags:   
+        - DPDomain.Marketing
+        - DPUsecase.Customer Segmentation
+        - DPUsecase.Product Recommendation
+        - DPTier.Consumer Aligned
+      metric:
+        expression: "*/45  * * * *"
+        timezone: "UTC"
+        window: "day"
+        excludes: 
+          - mntwines
+          - mntmeatproducts
+          - mntfishproducts
+          - mntsweetproducts
+          - mntgoldprods
+          - mntfruits
+          - numwebpurchases
+          - numcatalogpurchases
+          - numstorepurchases
+    tables:
+      - join_path: purchase
+        prefix: true
+        includes:
+          - cross_sell_opportunity_score
+          - mntwines
+          - mntmeatproducts
+          - mntfishproducts
+          - mntsweetproducts
+          - mntgoldprods
+          - mntfruits
+          - numwebpurchases
+          - numcatalogpurchases
+          - numstorepurchases
+          - customer_id
+          - purchase_date
+
+      - join_path: product
+        prefix: true
+        includes:
+          - product_category
+          - product_name
+
+
+
+

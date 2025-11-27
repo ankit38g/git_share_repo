@@ -1,0 +1,29 @@
+name: nb-pg-ank
+version: v1
+type: workflow
+tags:
+    - workflow
+    - nilus-batch
+description: Nilus Batch workflow Sample for Postgres to S3 Lakehouse
+workspace: public
+workflow:
+  dag:
+    - name: nb-job-01
+      spec:
+        stack: nilus:1.0
+        compute: runnable-default
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        logLevel: INFO
+        stackSpec:
+          source:
+            address: dataos://postgresnp
+            options:
+              source-table: "public.purchase_data_np"
+          sink:
+            address: dataos://icebase
+            options:
+              dest-table: pg_retail.batch_customer_ank
+              incremental-strategy: replace

@@ -1,0 +1,9 @@
+SELECT 
+    customer_id, 
+    birth_year, 
+    education, 
+    marital_status, 
+    income, 
+    country 
+FROM 
+    icebase.ankit.customer_data_ank

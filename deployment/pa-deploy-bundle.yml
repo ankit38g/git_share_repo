@@ -1,0 +1,44 @@
+name: Engg-metrics-nilus
+version: v1beta
+type: bundle
+tags:
+  - dataproduct
+description: This bundle resource is for the product affinity data product.
+layer: "user"
+bundle:
+  resources:
+    - id: lens
+      file: build/semantic-model/deployment.yml
+      workspace: public
+
+    # - id: api
+    #   file: activation/data-apis/service.yml
+    #   workspace: public
+    #   dependencies:
+    #     - lens
+
+    # - id: filter_policy
+    #   file: policy/filter-policy.yml
+    #   workspace: public
+    #   dependencies:
+    #     - api
+
+    - id: quality_customer
+      file: build/slo/input/customer.yml
+      workspace: public
+
+    - id: quality_product
+      file: build/slo/input/product.yml
+      workspace: public
+
+    - id: quality_purchase
+      file: build/slo/input/purchase.yml
+      workspace: public
+      
+    # - id: quality_affinity
+    #   file: build/slo/output/affinity-matrix.yml
+    #   workspace: public
+
+    # - id: quality_cross_sell
+    #   file: build/slo/output/cross-sell.yml
+    #   workspace: public

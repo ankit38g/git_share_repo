@@ -1,0 +1,49 @@
+name: pager-checks-alert
+version: v1alpha
+type: pager
+tags:
+  - dataos:type:resource
+description: This is for sending Alerts on Microsoft Teams Alert Test channel
+workspace: public
+pager:
+  conditions:
+    - valueJqFilter: .properties.name
+      operator: equals
+      value: checkfailsoda
+    - valueJqFilter: .properties.incident_type
+      operator: equals
+      value: sodaquality
+  output:
+    webHook:
+      url: {{Your webhook url}}
+      verb: post
+      headers:
+        'content-type': 'application/json'
+      bodyTemplate: |
+          {
+            "@type": "MessageCard",
+            "summary": "Alert on Quality Check failure",
+            "themeColor": "FF0000",
+
+            "sections": [
+              {
+                "activityTitle": "Dear Team,",
+                "activitySubtitle": "⚠️ Quality check has been failed. Please review this.",
+                "facts": [
+                  {
+                    "name": "Failure Time:",
+                    "value": "{{ .CreateTime }}"
+                  },
+                  {
+                    "name": "Severity:",
+                    "value": "{{ .Properties.severity }}"
+                  } ,
+                  {
+                    "name": "Alert:",
+                    "value": "{{range .EquationContext.QueryExpressions}}{{range .LeftRow.ContextColumns}}{{if eq .Name "check_definition"}} {{.Value}}, {{end}}{{end}}{{end}}"
+
+                  } 
+                ]
+              }
+            ]
+          }

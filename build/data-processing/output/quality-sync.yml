@@ -1,0 +1,142 @@
+version: v1
+name: wf-soda-checks-sync
+type: workflow
+workflow:
+  schedule:
+    cron: '0 9 * * 1-5'
+    timezone: UTC
+    concurrencyPolicy: Forbid
+  dag:
+    - name: soda-checks-sync
+      spec:
+        stack: flare:6.0
+        compute: runnable-default
+        stackSpec:
+          driver:
+            coreLimit: 2000m
+            cores: 1
+            memory: 2000m
+          executor:
+            coreLimit: 2000m
+            cores: 1
+            instances: 1
+            memory: 3000m 
+          job:
+            explain: true
+            logLevel: INFO
+            inputs:
+              - name: soda
+                dataset: dataos://systemstreams:soda/quality_profile_results_03
+                isStream: false
+                options:
+                  startingOffsets: earliest
+            
+            steps:
+              - sequence:
+                  - name: dropped_columns
+                    sql: SELECT * from soda
+                    functions:
+                      - name: drop
+                        columns:
+                          - __eventTime
+                          - __key
+                          - __producer_name
+                          - __messageProperties
+                          - __publishTime
+                          - __topic
+                          - automatedMonitoringChecks
+                          - clusterName
+                          - dataosResourceId
+                          - defaultDataSource
+                          - definitionName
+                          - engine
+                          - hasFailures
+                          - hasErrors
+                          - hasWarnings
+                          - logs
+                          - metadata
+                          - profiling
+                          - queries
+                          - runId
+                      - name: cleanse_column_names
+                  - name: checks_extracted
+                    sql: select * from dropped_columns
+                    functions:
+                      - name: unfurl 
+                        expression: explode(checks) as checks_
+                      - name: drop
+                        columns:
+                          - checks
+                      - name: rename_all
+                        columns:
+                          metrics: metrics_value
+                      - name: unfurl 
+                        expression: checks_.*
+                      - name: drop
+                        columns:
+                          - checks_
+                      - name: unfurl
+                        expression: explode(metrics) as metrics_
+                      - name: drop
+                        columns:
+                          - metrics
+                  - name: metrics_extracted
+                    sql: select dataos_run_id, metrics_value from checks_extracted
+                    functions:
+                      - name: unfurl 
+                        expression: explode(metrics_value) as metrics_value_
+                      - name: drop
+                        columns:
+                          - metrics_value
+                      - name: unfurl 
+                        expression: metrics_value_.*
+                      - name: drop
+                        columns:
+                          - metrics_value_
+
+                  - name: joined_checks_metrics01
+                    sql: SELECT
+                          ce.dataos_run_id,
+                          ce.job_name,
+                          ce.scan_start_timestamp AS timestamp,
+                          ce.user_name,
+                          ce.depot,
+                          ce.collection,
+                          ce.dataset,
+                          ce.column,
+                          ce.name AS check_definition,
+                          ce.resource_attributes AS resource_attributes,
+                          me.metric_name,
+                          me.value AS metric_value,
+                          ce.outcome AS check_outcome
+                        FROM
+                          checks_extracted ce
+                          LEFT JOIN metrics_extracted me ON ce.dataos_run_id = me.dataos_run_id
+                          AND ce.metrics_ = me.identity
+
+            outputs:
+              - name: joined_checks_metrics01
+                dataset: dataos://lakehouse:sys01/soda_quality_checks?acl=rw
+                format: Iceberg
+                options:
+                  saveMode: overwrite
+                  checkpointLocation: dataos://lakehouse:sys01/checkpoints/soda-quality-checks/v001?acl=rw
+                  sort:
+                    mode: partition
+                    columns:
+                        - name: depot
+                          order: desc
+                        - name: collection
+                          order: desc
+                        - name: dataset
+                          order: desc
+                  iceberg:
+                    partitionSpec:
+                      - type: identity
+                        column: depot
+                      - type: identity
+                        column: collection
+                      - type: identity
+                        column: dataset
+            
+

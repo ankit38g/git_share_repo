@@ -1,0 +1,37 @@
+name: thirdparty
+version: v1
+type: depot
+tags:
+  - dataos:type:resource
+  - dataos:type:cluster-resource
+  - dataos:resource:depot
+  - dataos:layer:user
+description: Default Third Party Depot for new
+owner: sairavitejamuttamsetty
+layer: user
+depot:
+  name: thirdparty
+  type: ABFSS
+  owner: 
+  description: Default Third Party Depot for new
+  secrets:
+        - name: thirdparty-rw
+          keys:
+          - thirdparty-rw
+        - name: thirdparty-r
+          keys:
+          - thirdparty-r
+  external: true
+  compute: query-default
+  resources:
+    requests:
+      cpu: 100m
+      memory: 550Mi
+    limits:
+      cpu: 1000m
+      memory: 1500Mi
+  spec:
+    account: mockdataos
+    container: dropzone001
+    relativePath: large_dataset_20200511
+  source: thirdparty

@@ -1,0 +1,46 @@
+name: nb-gitapi-ank
+version: v1
+type: workflow
+workspace: public
+tags:
+  - nilus_batch
+  - github-api-poc
+
+workflow:
+  dag:
+    - name: github-api-dag
+      spec:
+        stack: nilus:1.0
+        compute: runnable-default
+        logLevel: INFO
+
+        dataosSecrets:
+          - name: git-cred-em-rw
+            allKeys: true
+            consumptionType: envVars
+
+        stackSpec:
+
+          repo:
+            url: "https://github.com/ankit38g/engineering_metrics_pov"
+            # auth:
+            #   username: "${GITSYNC_USERNAME}"
+            #   password: "${GITSYNC_PASSWORD}"
+            syncFlags:
+              - "--ref=main"
+
+            baseDir: "engineering_metrics_pov/build/data-processing"
+
+          source:
+            address: >
+              custom://GitHubApiSource?
+              repo=ankit38g/product-affinity-training
+              &endpoint=commits
+            options:
+              source-table: github_commits
+
+          sink:
+            address: dataos://icebase
+            options:
+              dest-table: github_data.commits_ank
+              incremental-strategy: replace

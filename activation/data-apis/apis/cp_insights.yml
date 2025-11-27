@@ -1,0 +1,14 @@
+urlPath: /cross_sell
+description: This endpoint exposes individual customer purchase data and recommended cross-sell products for integration into CRM or sales platforms. 
+source: lens
+response:
+  - name: customer_id
+  - name: customer_segments
+  - name: cross_sell_recommendations
+cache:
+  - cacheTableName: 'cross_sell_cache'
+    sql: SELECT product_customer_id as customer_id FROM product
+    source: lens
+# tags:
+#   - cloud_cost_metrics
+

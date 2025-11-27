@@ -1,0 +1,34 @@
+version: v1
+name: read-kafka-np
+type: workflow
+tags:
+  - read-kafka
+description: this jobs reads data from kafka
+workflow:
+  dag:
+    - name: sample-read-kafka
+      title: read kafka sample data
+      spec:
+        stack: flare:7.0
+        compute: runnable-default
+
+        stackSpec:
+          job:
+            explain: true
+            streaming:
+             batchMode: true
+             triggerMode: Once #Once for cont
+            inputs:
+              - name: sample_data
+                dataset: dataos://systemstreams:audit/flare_query_events_01?acl=rw
+                isStream: true
+                options:
+                  startingOffsets: earliest
+            logLevel: INFO
+            outputs:
+              - name: sample_data
+                dataset: dataos://lakehouse:stream/stream_read_once_np?acl=rw
+                format: Iceberg
+                options:
+                  saveMode: append
+                  checkpointLocation: dataos://lakehouse:checkpoints/tqueryeventsync01

@@ -1,0 +1,54 @@
+name: soda-affinity-matrix-quality
+version: v1
+type: workflow
+tags:
+  - workflow
+  - soda-checks
+description: Applying quality checks for the product affinity matrix data
+workspace: public
+workflow:
+  # schedule:
+  #   cron: '00 08 * * *'
+  #  # endOn: '2023-12-12T22:00:00Z'
+  #   concurrencyPolicy: Forbid
+  dag:
+    - name: soda-affinity-matrix-quality
+      spec:
+        stack: soda+python:1.0
+        compute: runnable-default
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 250Mi
+          limits:
+            cpu: 1000m
+            memory: 250Mi
+        logLevel: INFO # WARNING, ERROR, DEBUG
+        stackSpec:
+          inputs:
+            - dataset: dataos://lakehouse:customer_relationship_management/product_affinity_matrix
+              options:
+                engine: minerva
+                clusterName: miniature
+              profile:
+                columns:
+                  - include *
+              checks:  
+                - schema:
+                    name: Data type of product affinity score should be decimal
+                    fail:
+                      when column type:
+                        product_affinity_score: decimal
+                    attributes:
+                      category: Schema
+ 
+                - missing_count(category_2) = 0:
+                    name:  Category_2 should not be zero
+                    attributes:
+                      category: Completeness
+ 
+                - avg_length(category_1) > 4:
+                    name:  Average length of category_1 more than 4
+                    attributes:
+                      category: Accuracy
+ 

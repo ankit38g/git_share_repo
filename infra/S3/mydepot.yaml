@@ -1,0 +1,30 @@
+name: dptestdata  
+version: v2alpha
+type: depot
+tags:
+  - S3
+  - dataos:type:resource
+  - dataos:type:cluster-resource
+  - dataos:resource:depot
+  - dataos:layer:user
+description: storage system depot is part  in workspace public
+owner: 
+layer: user
+depot:
+  name: poss3
+  type: S3
+  description: storage system depot is part in workspace public
+  secrets:
+    - name: tmdc-dataos-rw
+      keys:
+        - tmdc-dataos-rw
+    - name: tmdc-dataos-r
+      keys:
+        - tmdc-dataos-r
+  external: true
+  compute: runnable-default
+  s3:
+    bucket: "tmdc-dataos-testing"
+    relativePath: "/solution-demo"
+    format: iceberg
+  source: poss3

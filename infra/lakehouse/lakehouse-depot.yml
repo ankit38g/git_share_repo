@@ -1,0 +1,25 @@
+name: lakehouse
+version: v2alpha
+type: depot
+tags:
+  - Iceberg
+  - Azure
+owner: 
+layer: user
+depot:
+  type: ABFSS                                       
+  description: "Default Lakehouse"
+  external: true
+  compute: runnable-default
+  secrets:
+    - name: icebase-r
+      allkeys: true
+
+    - name: icebase-rw
+      allkeys: true
+  abfss:                                             
+    account: dlake0bnoss0dsck0stg
+    container: lake001
+    relativePath: /lakehouse01
+    format: ICEBERG
+  source: lakehouse

@@ -1,0 +1,27 @@
+name: productaffinity_api
+description: An api for sending affinity scores, enabling real-time cross-sell recommendations. 
+version: 0.0.1
+auth:
+  heimdallUrl: https://dataos-training.dataos.app/heimdall
+  userGroups:
+    - name : datadev
+      description: data dev group
+      includes:
+        - users:id:manishagrawal
+        - users:id:deepakjaiswal
+        - users:id:nandapage
+        - users:id:aayushisolanki
+
+    - name: default
+      description: Default group to accept everyone
+      includes: "*"
+logLevel: 'DEBUG' 
+cachePath: tmp
+sources:
+  - name: lens # profile name
+    type: lens
+    lensName: 'public:productaffinity'
+
+metrics:
+  type: summary
+  percentiles: [ 0.5, 0.75, 0.95, 0.98, 0.99 ]

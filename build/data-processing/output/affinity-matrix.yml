@@ -1,0 +1,72 @@
+version: v1
+name: wf-affinity-matrix-data
+type: workflow
+tags:
+  - crm
+description: Ingesting a matrix showing the affinity score between all product categories.
+workflow:
+  dag:
+    - name: dg-affinity-data
+      description: A matrix showing the affinity score between all product categories (e.g., customers who buy wine are X% likely to also buy meat). 
+      spec:
+        tags:
+          - crm
+        stack: flare:6.0
+        compute: runnable-default
+        stackSpec:
+          driver:
+            coreLimit: 2000m
+            cores: 1
+            memory: 1000m
+          executor:
+            coreLimit: 2000m
+            cores: 1
+            instances: 1
+            memory: 2000m
+          job:
+            explain: true
+            logLevel: INFO
+            inputs:
+              - name: product_data
+                dataset: dataos://lakehouse:customer_relationship_management/product_data?acl=rw
+                format: Iceberg
+
+            steps:
+              - sequence:
+                  - name: affinity_view
+                    sql: >
+                        SELECT 
+                          customer_id,
+                          CASE
+                            WHEN rand() < 0.2 THEN 'Wines'
+                            WHEN rand() < 0.4 THEN 'Meats'
+                            WHEN rand() < 0.6 THEN 'Fish'
+                            WHEN rand() < 0.8 THEN 'Sweet Products'
+                            ELSE 'Fruits'
+                          END AS product_category
+                        FROM product_data
+                    
+                  - name: final
+                    sql: >
+                        SELECT 
+                          cp1.product_category AS category_1,
+                          cp2.product_category AS category_2,
+                          CAST((COUNT(DISTINCT cp1.customer_id) * 4/ 10.0) AS DECIMAL(10,2)) AS product_affinity_score
+                        FROM affinity_view as cp1
+                        JOIN affinity_view as cp2 ON cp1.customer_id != cp2.customer_id AND cp1.product_category != cp2.product_category
+                        GROUP BY cp1.product_category, cp2.product_category
+
+            outputs:
+              - name: final
+                dataset: dataos://lakehouse:customer_relationship_management/product_affinity_matrix?acl=rw
+                format: Iceberg
+                options:
+                  saveMode: overwrite
+                  iceberg:
+                    properties:
+                      write.format.default: parquet
+                      write.metadata.compression-codec: gzip
+                    # partitionSpec:
+                    #   - type: day
+                    #     column: date_time
+                    #     name: day

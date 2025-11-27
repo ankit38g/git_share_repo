@@ -1,0 +1,65 @@
+name: miniature
+version: v1
+type: cluster
+tags:
+  - cluster
+  - minerva
+  - dataos:type:resource
+  - dataos:resource:cluster
+  - dataos:layer:system
+  - dataos:workspace:system
+description: the default minerva cluster
+workspace: system
+cluster:
+  compute: query-default
+  type: minerva
+  minerva:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 2000m
+        memory: 2Gi
+      limits:
+        cpu: 6000m
+        memory: 12Gi
+    depots:
+      - address: dataos://gateway:default
+      - address: dataos://metisdb:default
+      - address: dataos://depotservice:default
+      - address: dataos://lakehouse:none?acl=rw
+      - address: dataos://postgres:default?acl=rw
+      - address: dataos://ecpgdepot:default?acl=rw
+      - address: dataos://sivapostgresdepot:default?acl=rw
+      - address: dataos://bigquerysiva:default?acl=rw
+      - address: dataos://arablepostgres:default?acl=rw
+      - address: dataos://modempg:default?acl=rw
+      - address: dataos://postgresdeviceteledepot:default?acl=rw
+      - address: dataos://devicepostgres:default?acl=rw
+      - address: dataos://sstdepot:default?acl=rw
+      - address: dataos://ecomdata:default?acl=rw
+      - address: dataos://testawslh:default?acl=rw
+      - address: dataos://archanadepot:default
+      - address: dataos://snowflakedepotajp:default
+      - address: dataos://snowflakedepotck:default
+      - address: dataos://mdepot:default
+    catalogs:
+      - name: cache
+        type: memory
+        properties:
+          memory.max-data-per-node: 128MB
+    coordinatorEnvs:
+      CONF__config__query.max-memory: 8GB
+      CONF__config__query.max-memory-per-node: 4GB
+      CONF__config__query.max-stage-count: '300'
+      CONF__config__query.max-total-memory: 9GB
+      JVM__opts: '-Xmx7G --add-opens=java.base/java.nio=ALL-UNNAMED'
+    workerEnvs:
+      CONF__config__query.max-memory: 8GB
+      CONF__config__query.max-memory-per-node: 4GB
+      CONF__config__query.max-revocable-memory-per-node: 2GB
+      CONF__config__query.max-stage-count: '300'
+      CONF__config__query.max-total-memory: 9GB
+      JVM__opts: '-Xmx7G --add-opens=java.base/java.nio=ALL-UNNAMED'
+    debug:
+      logLevel: INFO
+      trinoLogLevel: ERROR

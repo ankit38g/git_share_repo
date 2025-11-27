@@ -1,0 +1,68 @@
+name: productaffinity-garg
+version: v1beta
+entity: product
+type: data
+tags:
+  - DPDomain.Marketing
+  # - DPUsecase.Customer Segmentation
+  # - DPUsecase.Product Recommendation
+  - DPTier.Consumer Aligned
+description: Identifies cross-sell opportunities through product affinity analysis, improving recommendations by understanding product relationships.
+# refs:
+#   - title: 'Workspace Info'
+#     href: https://dataos.info/interfaces/cli/command_reference/#workspace
+
+#   - title: 'Product Affinity Analysis'
+#     href: https://app.appsmith.com/app/product-affinity-demo/page1-67777255cf8fcd425e4a018f
+v1beta:
+  data:
+    meta:
+      title: Product Affinity Garg
+      sourceCodeUrl: https://github.com/ankit38g/product-affinity-training
+      # trackerUrl: https://rubikai.atlassian.net/browse/DPRB-65
+ 
+    collaborators:
+      - name: ankitgarg
+        description: owner
+      # - name: deepakjaiswal
+      #   description: developer
+      # - name: nandapage
+      #   description: consumer
+      # - name: aayushisolanki
+      #   description: consumer
+    resource:
+      refType: dataos
+      ref: bundle:v1beta:productaffinity-bundle-ank
+
+    inputs:
+      - refType: dataos
+        ref: dataset:azureblob:onboarding:customer.csv
+
+      - refType: dataos
+        ref: dataos://postgresnp:public/purchase_data_np
+
+      - refType: dataos
+        ref: dataset:azureblob:onboarding:product.csv
+
+
+    outputs:
+      - refType: dataos
+        ref: dataset:icebase:ankit:customer_data_ank
+
+      - refType: dataos
+        ref: dataos://postgresnp:public/purchase_data_np
+
+      - refType: dataos
+        ref: dataset:icebase:ankit:product_data_ank
+
+    ports:
+      lens:
+        ref: lens:v1alpha:productaffinity-ank:public
+        refType: dataos
+
+      # talos:
+      #   - ref: service:v1:product-affinity-api:public
+      #     refType: dataos
+
+
+      

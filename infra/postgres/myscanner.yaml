@@ -1,0 +1,12 @@
+version: v1
+name: wf-scanner-postgres-depot
+type: workflow
+workflow:
+  dag:
+    - name: postgres-depot
+      description: Scans schema tables in Postgres
+      spec:
+        stack: scanner:2.0
+        compute: runnable-default
+        stackSpec:
+          depot: dataos://postgrestest11

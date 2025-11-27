@@ -1,0 +1,61 @@
+name: soda-cross-sell-quality
+version: v1
+type: workflow
+tags:
+  - workflow
+  - soda-checks
+description: Applying quality checks for the cross sell data
+workspace: public
+workflow:
+  # schedule:
+  #   cron: '00 08 * * *'
+  #  # endOn: '2023-12-12T22:00:00Z'
+  #   concurrencyPolicy: Forbid
+  dag:
+    - name: soda-cross-sell-quality
+      spec:
+        stack: soda+python:1.0
+        compute: runnable-default
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 250Mi
+          limits:
+            cpu: 1000m
+            memory: 250Mi
+        logLevel: INFO # WARNING, ERROR, DEBUG
+        stackSpec:
+          inputs:
+            - dataset: dataos://lakehouse:customer_relationship_management/cross_sell_recommendations
+              options:
+                engine: minerva
+                clusterName: miniature
+              profile:
+                columns:
+                  - include *
+              checks:  
+                - schema:
+                    name: Data type of customer segments should be string
+                    fail:
+                      when column type:
+                        customer_segments: string
+                    attributes:
+                      category: Schema
+ 
+                - invalid_count(customer_id) = 1 :
+                    name: Customer Id  should not be zero
+                    valid min: 1
+                    attributes:
+                      category: Validity
+ 
+                - missing_count(customer_id) = 0:
+                    name:  Customer Id should not be zero
+                    attributes:
+                      category: Completeness
+
+                - duplicate_count(customer_id) = 0:
+                    name:  Customer Id should not be duplicated
+                    attributes:
+                      category: Uniqueness
+
+ 

@@ -1,0 +1,13 @@
+urlPath: /affinity
+description: This endpoint provides affinity scores between product categories, enabling real-time cross-sell recommendations. 
+source: lens
+response:
+  - name: category_1
+  - name: category_2
+  - name: customer_id
+  - name: product_affinity_score
+cache:
+  - cacheTableName: 'affinity_cache'
+    sql: SELECT product_customer_id as customer_id,product_category FROM product
+    source: lens
+

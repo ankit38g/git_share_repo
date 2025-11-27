@@ -1,0 +1,68 @@
+---
+version: v1  # v1
+name: wf-cross-sell-data
+type: workflow
+tags:
+  - crm
+description: Ingesting customer segments.
+workflow:
+  dag:
+    - name: dg-cross-data
+      description: Segment the customers into groups based on churn risk with the different campaign recommendations for retention. 
+      spec:
+        tags:
+          - crm
+        stack: flare:6.0
+        compute: runnable-default
+        stackSpec:
+          driver:
+            coreLimit: 2000m
+            cores: 1
+            memory: 1000m
+          executor:
+            coreLimit: 2000m
+            cores: 1
+            instances: 1
+            memory: 2000m
+          job:
+            explain: true
+            logLevel: INFO
+            inputs:
+              - name: product_data
+                dataset: dataos://lakehouse:customer_relationship_management/product?acl=rw
+                format: iceberg
+
+            steps:
+              - sequence:
+                  - name: final
+                    sql: >
+                      SELECT 
+                        customer_id,
+                        CASE 
+                          WHEN rand() < 0.33 THEN 'High Risk'
+                          WHEN rand() < 0.66 THEN 'Moderate Risk'
+                          ELSE 'Low Risk'
+                        END AS customer_segments,
+                        CASE 
+                          WHEN rand() < 0.33 THEN CASE WHEN rand() < 0.5 THEN 'Pair Wine with Meat' ELSE 'Pair Fish with Sweet Products' END
+                          WHEN rand() < 0.66 THEN CASE WHEN rand() < 0.5 THEN 'Pair Meat with Fruits' ELSE 'Pair Wine with Fish' END
+                        ELSE 
+                            CASE WHEN rand() < 0.5 THEN 'Pair Fruits with Sweet Products' ELSE 'Pair Wine with Fruits' END 
+                        END AS cross_sell_recommendations
+                      FROM product_data
+           
+            outputs:
+              - name: final
+                dataset: dataos://lakehouse:customer_relationship_management/cross_sell_recommendations?acl=rw
+                format: Iceberg
+                options:
+                  saveMode: overwrite
+                  iceberg:
+                    properties:
+                      write.format.default: parquet
+                      write.metadata.compression-codec: gzip
+                    # partitionSpec:
+                    #   - type: day
+                    #     column: date_time
+                    #     name: day
+

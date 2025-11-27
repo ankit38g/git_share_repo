@@ -1,0 +1,16 @@
+version: v1
+name: mndepot-scanner     # Scanner name
+type: workflow                # Type of file
+tags:                         # Tags used to search this file
+  - oracle
+  - scanner
+description: The job scans schema tables and register metadata    # Description of the scanner
+workflow:                     # Workflow parameters
+  dag:                        
+    - name: oracledepotjob # DAG name
+      description: The job scans schema from oracle depot tables and register metadata to metis # Description of DAG
+      spec:                   # spec section
+        stack: scanner:2.0    
+        compute: runnable-default
+        stackSpec:
+          depot: dataos://mndepot    # snowflake depot name

@@ -1,0 +1,24 @@
+name: postgrestest11
+version: v2alpha
+type: depot
+layer: user
+depot:
+  type: jdbc                 
+  description: default postgres depot
+  external: true
+  secrets:
+    - name: postgres-rw
+      keys: 
+        - postgres-rw
+      allkeys: true
+
+    - name: postgres-r
+      keys: 
+        - postgres-r
+      allkeys: true
+    
+  jdbc:
+    subprotocol: postgresql
+    host: usr-db-dataos-ck-eymm-dataostra-stg.postgres.database.azure.com
+    port: 5432
+    database: postgres

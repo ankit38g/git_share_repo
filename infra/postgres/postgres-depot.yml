@@ -1,0 +1,24 @@
+name: postgresnp
+version: v2alpha
+type: depot
+layer: user
+depot:
+  type: jdbc                 
+  description: default postgres depot
+  external: true
+  secrets:
+    - name: postgresank-rw
+      keys: 
+        - postgresank-rw
+      allkeys: true
+
+    - name: postgresank-r
+      keys: 
+        - postgresank-r
+      allkeys: true
+    
+  jdbc:
+    subprotocol: postgresql
+    host: sys-db-dataos-ck-mlmf-gentlegho-dev.postgres.database.azure.com
+    port: 5432
+    database: modern-postgres

@@ -1,0 +1,69 @@
+name: pager-checks-alert
+version: v1alpha
+type: pager
+tags:
+  - dataos:type:resource
+description: This is for sending Alerts on Microsoft Teams Alert Test channel
+workspace: public
+pager:
+  conditions:
+    - valueJqFilter: .properties.name
+      operator: equals
+      value: Soda Fail Checks
+    - valueJqFilter: .properties.incident_type
+      operator: equals
+      value: Soda Quality Checks
+  output:
+    email:
+      emailTargets:
+        - deepak.jaiswal@tmdc.io
+      templateType: liquid
+      template: |
+        <p><strong>Dear Team,</strong></p>
+
+        <p>⚠️ Alerts: Data quality check failed due to inconsistencies and inaccuracies; immediate action required to maintain integrity and reliability.</p>
+
+        <div style="font-family: Arial, sans-serif;">
+          <table border="0" cellspacing="0" cellpadding="8" style="font-family: Arial, sans-serif; font-size: 14px; width: 100%; border-collapse: collapse;">
+            <tbody>
+              <tr style="border-top: 2px solid #000; border-bottom: 1px solid #ccc;">
+                <td style="font-weight: bold;">Incident Name</td>
+                <td>{{ incidentProperties.name }}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #ccc;">
+                <td style="font-weight: bold;">Severity</td>
+                <td>{{ incidentProperties.severity }}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #ccc;">
+                <td style="font-weight: bold;">Failure Time</td>
+                <td>{{ incidentCreated }}</td>
+              </tr>
+              <tr style="border-bottom: 2px solid #000;">
+                <td style="font-weight: bold;">Failed Checks</td>
+                <td>
+                  <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                      <tr style="border-bottom: 2px solid #000;">
+                        <th style="text-align: left; padding: 5px; font-weight: bold;">Check Definition</th>
+                        <th style="text-align: left; padding: 5px; font-weight: bold;">Metric Name</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for check in incidentContext.data %}
+                        <tr>
+                          <td style="padding: 5px;">{{ check.leftRow.contextColumns[0].value }}</td>
+                          <td style="padding: 5px;">{{ check.leftRow.contextColumns[1].value }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Best regards,</p>
+
+        <p>The Modern Data Company</p>
+

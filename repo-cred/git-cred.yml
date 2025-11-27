@@ -1,0 +1,17 @@
+name: git-cred-em-rw
+version: v1
+type: instance-secret
+tags:
+  - dataos:type:resource
+  - dataos:type:cluster-resource
+  - dataos:resource:instance-secret
+  - dataos:layer:user
+description: git read secrets for repos.
+owner: ""
+layer: user
+instance-secret:
+  type: key-value
+  acl: r
+  data:
+    GITSYNC_PASSWORD: ""                         # Use the token from your Git account
+    GITSYNC_USERNAME: "ankit38g"                         # Use your Git username

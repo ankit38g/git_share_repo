@@ -1,0 +1,27 @@
+name: sftest
+version: v2alpha
+type: depot
+tags:
+  - Snowflake depot
+  - user data
+layer: user
+depot:
+  name: sftest
+  type: snowflake
+  description: Depot to fetch data from Snowflake datasource
+  secrets:
+    - name: sftest-r
+      keys:
+        - sftest-r
+      allKeys: true
+    - name: sftest-rw
+      keys:
+        - sftest-rw
+      allKeys: true
+  external: true
+  snowflake:
+    database: TMDC_V1
+    url: abcd-mp48932.snowflakecomputing.com     # dont use https:// 
+    warehouse: COMPUTE_WH
+    account: abcd-mp48932
+  source: sftest

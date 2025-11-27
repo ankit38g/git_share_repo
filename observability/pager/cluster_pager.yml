@@ -1,0 +1,49 @@
+name: pending-cluster-pager
+version: v1alpha
+type: pager
+tags:
+  - dataos:type:resource
+description: This is for sending Alerts on Microsoft Teams Alert Test channel
+workspace: public
+pager:
+  conditions:
+    - valueJqFilter: .properties.name
+      operator: equals
+      value: pendingcluster
+    - valueJqFilter: .properties.incidentType
+      operator: equals
+      value: clusterpending
+
+  output:
+    webHook:
+      url: {{Your webhook url}}
+      verb: post
+      headers:
+        'content-type': 'application/json'
+      bodyTemplate: |
+
+          {
+            "@type": "MessageCard",
+            "summary": "Alert on Cluster System Status",
+            "themeColor": "FF0000",
+            "sections": [
+              {
+                "activityTitle": "Dear Team,",
+                "activitySubtitle": "⚠️ Our Miniature cluster is in Pending or Error State.",
+                "facts": [
+                  {
+                    "name": "Time:",
+                    "value": "{{ .CreateTime }}"
+                  },
+                  {
+                    "name": "Severity:",
+                    "value": "{{ .Properties.severity }}"
+                  }
+                ]
+              },
+              {
+                "title": "Message",
+                "text": "Miniature Cluster is in Pending Or Error State !!!\n\n Please review this issue promptly."
+              }
+            ]
+          }

@@ -1,0 +1,17 @@
+version: v1
+name: wf-postgres-depot-ank
+type: workflow
+tags:
+  - postgres-depot-scan
+description: The job scans schema tables and register data to metis
+workflow:
+  dag:
+    - name: postgres-depot
+      description: The job scans schema from postgres depot tables and register data to metis
+      spec:
+        tags:
+          - scanner
+        stack: scanner:2.0
+        compute: runnable-default
+        stackSpec:
+          depot: dataos://postgresnp

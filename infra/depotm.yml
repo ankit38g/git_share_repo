@@ -1,0 +1,24 @@
+name: mndepot
+version: v2alpha
+type: depot
+description: oracle-depot-db
+tags:
+  - oracle-depot-db
+layer: user
+depot:
+  type: ORACLE                                    
+  oracle:
+    subprotocol: oracle:thin # for example "oracle:thin"                                     
+    host: localhost
+    port: 1521
+    service: xe
+  external: true
+  secrets:
+    - name: mndepot-r
+      keys: 
+       - mndepot-r
+      allkeys: true
+    - name: mndepot-rw
+      keys: 
+       - mndepot-rw
+      allkeys: true

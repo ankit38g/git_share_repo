@@ -1,0 +1,28 @@
+name: clusterpodsmonitor
+version: v1alpha
+type: monitor
+tags:
+  - dataos:type:resource
+  - dataos:type:cluster-resource
+  - dataos:resource:policy
+  - dataos:layer:user
+description: Attention! cluster is in pending or error status
+layer: user
+monitor:
+  schedule: '30 4-13 * * 1-5'     
+  type: report_monitor
+  report:
+    source:
+      dataOsInstance:
+        path: /collated/api/v1/reports/resources/runtime?id=cluster:v1:miniature:system               
+    conditions:
+    - valueComparison:
+        observationType: runtime
+        valueJqFilter: 'if .value != "running:1" then "PendingOrError" else "running" end'
+        operator: equals
+        value: PendingOrError
+
+  incident:
+    name: pendingcluster
+    severity: high
+    incidentType: clusterpending

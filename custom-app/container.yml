@@ -1,0 +1,45 @@
+version: v1
+name: pas
+type: service
+service:
+  replicas: 1
+  servicePort: 8501
+  ingress:
+    enabled: true
+    noAuthentication: true
+    path: /product-affinity
+    stripPath: true
+    appDetailSpec: '{ 
+      "name": "Affinity Insights",
+      "title": "Product Affinity Insights",
+      "releaseLevel": "alpha",
+      "description": "Gain powerful insights of customers and product relationships effortlessly.",
+      "section": "Demo",
+      "path": "/product-affinity/",
+      "keyword": "Product Affinity Analysis",
+      "isInternal": false,
+      "disabled": false,
+      "navigation": []
+    }'
+  stack: container
+  compute: runnable-default
+  envs:
+    SECRET: "--config /etc/dataos/config/secret.conf"
+  configs:
+    secret.conf: custom-app/Secret.json
+  resources:
+    requests:
+      cpu: 100m
+      memory: 200Mi
+    limits:
+      cpu: 200m
+      memory: 300Mi
+  stackSpec:
+    image:  deep2407/streamlit-pas:0.0.1
+    command:
+      - streamlit
+    arguments:
+      - run
+      - app.py
+
+    

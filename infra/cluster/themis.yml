@@ -1,0 +1,104 @@
+name: minion
+version: v1
+type: cluster
+tags:
+  - themis
+description: themis cluster in default workspace
+cluster:
+  compute: query-default
+  type: themis
+  themis:
+    themisConf:
+        kyuubi.session.engine.idle.timeout: '30'
+    replicas: 2
+    resources:
+      requests:
+        cpu: '3'
+        memory: 3Gi
+      limits: {}
+    spark:
+      sparkConf:
+        spark.driver.maxResultSize: 3gb
+        spark.executor.cores: 3  #parallel tasks to run this. should be always 1 less than the limit on executor CPU(to increase concurrent tasks)
+        spark.sql.shuffle.partitions: 100  #100 (3times (executor.cores X maxinstancecount))
+        spark.sql.files.maxPartitionBytes: 1mb
+        spark.sql.files.minPartitionNum: 10
+        spark.sql.adaptive.enabled: 'true'
+        spark.sql.adaptive.coalescePartitions.enabled: 'true'
+        spark.sql.adaptive.coalescePartitions.initialPartitionNum: 100  #100
+        spark.kubernetes.driver.volumes.persistentVolumeClaim.themis-persistent-v.options.claimName: "persistent-v"
+        spark.kubernetes.driver.volumes.persistentVolumeClaim.themis-persistent-v.mount.path: "/tmp/spark-data/"
+        spark.kubernetes.driver.volumes.persistentVolumeClaim.themis-persistent-v.mount.readOnly: "false"
+        spark.kubernetes.executor.volumes.persistentVolumeClaim.themis-persistent-v.options.claimName: "persistent-v"
+        spark.kubernetes.executor.volumes.persistentVolumeClaim.themis-persistent-v.mount.path: "/tmp/spark-data/"
+        spark.kubernetes.executor.volumes.persistentVolumeClaim.themis-persistent-v.mount.readOnly: "false"
+      driver:
+        resources:
+          limits: 
+            cpu: 2000m
+          requests:
+            memory: 8G
+            cpu: 1000m
+      executor:name: minion
+version: v1
+type: cluster
+tags:
+  - themis
+description: themis cluster in default workspace
+cluster:
+  compute: query-default
+  type: themis
+  themis:
+    themisConf:
+        kyuubi.session.engine.idle.timeout: '30'
+    replicas: 2
+    resources:
+      requests:
+        cpu: '3'
+        memory: 3Gi
+      limits: {}
+    spark:
+      sparkConf:
+        spark.driver.maxResultSize: 3gb
+        spark.executor.cores: 3  #parallel tasks to run this. should be always 1 less than the limit on executor CPU(to increase concurrent tasks)
+        spark.sql.shuffle.partitions: 100  #100 (3times (executor.cores X maxinstancecount))
+        spark.sql.files.maxPartitionBytes: 1mb
+        spark.sql.files.minPartitionNum: 10
+        spark.sql.adaptive.enabled: 'true'
+        spark.sql.adaptive.coalescePartitions.enabled: 'true'
+        spark.sql.adaptive.coalescePartitions.initialPartitionNum: 100  #100
+        spark.kubernetes.driver.volumes.persistentVolumeClaim.themis-persistent-v.options.claimName: "persistent-v"
+        spark.kubernetes.driver.volumes.persistentVolumeClaim.themis-persistent-v.mount.path: "/tmp/spark-data/"
+        spark.kubernetes.driver.volumes.persistentVolumeClaim.themis-persistent-v.mount.readOnly: "false"
+        spark.kubernetes.executor.volumes.persistentVolumeClaim.themis-persistent-v.options.claimName: "persistent-v"
+        spark.kubernetes.executor.volumes.persistentVolumeClaim.themis-persistent-v.mount.path: "/tmp/spark-data/"
+        spark.kubernetes.executor.volumes.persistentVolumeClaim.themis-persistent-v.mount.readOnly: "false"
+      driver:
+        resources:
+          limits: 
+            cpu: 2000m
+          requests:
+            memory: 8G
+            cpu: 1000m
+      executor:
+        resources:
+          limits: 
+            cpu: 4000m
+          requests:  
+            memory: 12G
+            cpu: 2000m
+        instanceCount: 1 #minimum executors
+        maxInstanceCount: 8 #maximum executors 15
+    depots:
+      - address: dataos://nivesfdepot
+      - address: dataos://lakehouse
+      - address: dataos://ecpgdepot
+        resources:
+          limits: 
+            cpu: 4000m
+          requests:  
+            memory: 12G
+            cpu: 2000m
+        instanceCount: 1 #minimum executors
+        maxInstanceCount: 8 #maximum executors 15
+    
