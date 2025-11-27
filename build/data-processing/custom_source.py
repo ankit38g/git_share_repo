@@ -1,46 +1,48 @@
 import os
 import requests
 import nilus
+from nilus import CustomSource
 
 @nilus.source
 def github_source(repo: str, endpoint: str):
-    """
-    Nilus Custom Source to fetch GitHub API data using GitHub REST API.
-    Supports pagination automatically.
-    """
 
     username = os.getenv("GITSYNC_USERNAME")
     token = os.getenv("GITSYNC_PASSWORD")
 
     if not token:
-        raise Exception("GitHub token missing (env: GITSYNC_PASSWORD)")
+        raise Exception("GitHub token missing (GITSYNC_PASSWORD)")
 
-    base_url = f"https://api.github.com/repos/{repo}/{endpoint}"
+    api_url = f"https://api.github.com/repos/{repo}/{endpoint}"
+
     headers = {
         "Authorization": f"Bearer {token}",
         "User-Agent": username or "nilus-github-source"
     }
 
-    page = 1
-    per_page = 100   # GitHub max per page
+    response = requests.get(api_url, headers=headers)
 
-    while True:
-        url = f"{base_url}?per_page={per_page}&page={page}"
-        response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        raise Exception(
+            f"GitHub API error: {response.status_code} → {response.text}"
+        )
 
-        if response.status_code != 200:
-            raise Exception(
-                f"GitHub API error: {response.status_code} → {response.text}"
-            )
+    data = response.json()
+    if isinstance(data, dict):
+        yield data
+        return
 
-        data = response.json()
+    for item in data:
+        yield item
 
-        # If no more data → break
-        if not data:
-            break
 
-        # Yield all items
-        for item in data:
-            yield item
+# ----------------------------------------------------
+# 🔥 REQUIRED WRAPPER: Nilus wants a CustomSource class
+# ----------------------------------------------------
+class GitHubApiSource(CustomSource):
+    """
+    Wrapper class required by Nilus.
+    It simply maps the URI parameters to github_source().
+    """
 
-        page += 1
+    def nilus_source(self, repo: str, endpoint: str, **kwargs):
+        return github_source(repo=repo, endpoint=endpoint)
