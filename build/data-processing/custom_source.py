@@ -15,7 +15,7 @@ class GitHubApiSource(CustomSource):
 
     def nilus_source(self, uri: str, table: str, **kwargs):
         """
-        Nilus will call this method with the full URI.
+        Nilus will call this method with the full URI. 
         We parse parameters and call the actual wrapper.
         """
         from urllib.parse import urlparse, parse_qs

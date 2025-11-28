@@ -34,7 +34,9 @@ workflow:
           source:
             address: "custom://GitHubApiSource?repo=ankit38g/engg_metrics_pov&endpoint=commits"
             options:
-              source-table: github_commits
+              source-table: github_commits_masked
+              mask:
+                commit: partial:2
 
           sink:
             address: dataos://icebase
