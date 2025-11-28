@@ -64,12 +64,12 @@ class GitHubApiRunner:
         if isinstance(data, dict):
             data = [data]
 
-        @dlt.resource(name="github_commits")
-        def github_commits():
+        @dlt.resource(name="github_commits_masked")
+        def github_commits_masked():
             for row in data:
                 yield row
 
-        return github_commits
+        return github_commits_masked
 
 
 # ---------------------------------------------------------

@@ -1,4 +1,4 @@
-name: nb-gitapi-ank
+name: nb-gitapi-ank1
 version: v1
 type: workflow
 workspace: public
@@ -41,5 +41,5 @@ workflow:
           sink:
             address: dataos://icebase
             options:
-              dest-table: github_data.commits_ank
+              dest-table: github_data
               incremental-strategy: replace
