@@ -71,7 +71,6 @@ class GitHubApiRunner:
 
         return github_commits_masked
 
-
 # ---------------------------------------------------------
 # 3) Decorated wrapper — Nilus-friendly
 # ---------------------------------------------------------
