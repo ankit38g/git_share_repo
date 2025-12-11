@@ -7,9 +7,9 @@ tags:
 description: This semantic model provides comprehensive insights for product affinity analysis.
 lens:
   compute: runnable-default
-  secrets:
-    - name: git-cred-ank-rw
-      allKeys: true
+  # secrets:
+  #   - name: git-cred-ank-rw
+  #     allKeys: true
   source:
     type: minerva
     name: miniature
